@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checklist-lər - SecTools.az</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        body { background: linear-gradient(135deg, #0A0A0A 0%, #121212 100%); color: #F2F2F2; overflow-x: hidden; }
+        .wave-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; }
+        .wave-svg { position: absolute; width: 120%; height: 100%; opacity: 0.15; }
+        .wave-path { stroke: #FF0040; stroke-width: 3; fill: none; filter: drop-shadow(0 0 15px #FF0040); }
+        .wave-path:nth-child(1) { animation: wave-flow-1 25s ease-in-out infinite; opacity: 0.8; }
+        .wave-path:nth-child(2) { animation: wave-flow-2 30s ease-in-out infinite; opacity: 0.6; animation-delay: -10s; }
+        .wave-path:nth-child(3) { animation: wave-flow-3 35s ease-in-out infinite; opacity: 0.4; animation-delay: -20s; }
+        @keyframes wave-flow-1 {
+            0%, 100% { d: path("M-200,150 Q300,80 800,150 T1600,150 L1600,0 L-200,0 Z"); }
+            33% { d: path("M-200,120 Q300,200 800,120 T1600,120 L1600,0 L-200,0 Z"); }
+            66% { d: path("M-200,180 Q300,50 800,180 T1600,180 L1600,0 L-200,0 Z"); }
+        }
+        @keyframes wave-flow-2 {
+            0%, 100% { d: path("M-200,250 Q400,180 900,250 T1700,250 L1700,0 L-200,0 Z"); }
+            50% { d: path("M-200,200 Q400,300 900,200 T1700,200 L1700,0 L-200,0 Z"); }
+        }
+        @keyframes wave-flow-3 {
+            0%, 100% { d: path("M-200,350 Q500,280 1000,350 T1800,350 L1800,0 L-200,0 Z"); }
+            25% { d: path("M-200,300 Q500,400 1000,300 T1800,300 L1800,0 L-200,0 Z"); }
+            75% { d: path("M-200,380 Q500,250 1000,380 T1800,380 L1800,0 L-200,0 Z"); }
+        }
+        .navbar { background: rgba(10, 10, 10, 0.8); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 0, 64, 0.2); transition: all 0.3s ease; }
+        .navbar.scrolled { background: rgba(10, 10, 10, 0.95); box-shadow: 0 4px 20px rgba(255, 0, 64, 0.1); }
+        .btn-wave { position: relative; overflow: hidden; background: linear-gradient(45deg, #FF0040, #FF1A5C); border: none; transition: all 0.3s ease; }
+        .btn-wave::before { content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0; background: rgba(255, 255, 255, 0.3); border-radius: 50%; transform: translate(-50%, -50%); transition: width 0.6s, height 0.6s; }
+        .btn-wave:active::before { width: 300px; height: 300px; }
+        .btn-wave:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255, 0, 64, 0.4); }
+        .glass-container { background: rgba(22, 22, 22, 0.7); backdrop-filter: blur(15px); border: 1px solid rgba(255, 0, 64, 0.2); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 0 50px rgba(255, 0, 64, 0.1); }
+        .neon-title { background: linear-gradient(45deg, #F2F2F2, #FF0040, #F2F2F2); background-size: 200% 200%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: title-glow 3s ease-in-out infinite; }
+        .neon-accent { color: #FF0040; text-shadow: 0 0 20px rgba(255, 0, 64, 0.8); animation: neon-flicker 2s ease-in-out infinite alternate; }
+        @keyframes title-glow { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+        @keyframes neon-flicker { 0% { text-shadow: 0 0 20px rgba(255, 0, 64, 0.8); } 100% { text-shadow: 0 0 30px rgba(255, 0, 64, 1), 0 0 40px rgba(255, 0, 64, 0.8); } }
+        .progress-bar { background: rgba(255, 0, 64, 0.2); border-radius: 10px; overflow: hidden; }
+        .progress-fill { background: linear-gradient(45deg, #FF0040, #FF1A5C); height: 100%; border-radius: 10px; transition: width 0.5s cubic-bezier(0.25, 1, 0.5, 1); }
+        .search-input { background: rgba(42, 42, 42, 0.6); border: 1px solid rgba(255, 0, 64, 0.2); color: #F2F2F2; transition: all 0.3s ease; }
+        .search-input:focus { outline: none; border-color: #FF0040; box-shadow: 0 0 20px rgba(255, 0, 64, 0.3); background: rgba(42, 42, 42, 0.8); }
+        .particle { position: absolute; width: 4px; height: 4px; background: #FF0040; border-radius: 50%; animation: float-particle 20s linear infinite; opacity: 0.7; box-shadow: 0 0 6px #FF0040; }
+        @keyframes float-particle { 0% { transform: translateY(100vh) translateX(0px) rotate(0deg); opacity: 0; } 10% { opacity: 0.7; } 90% { opacity: 0.7; } 100% { transform: translateY(-100px) translateX(100px) rotate(360deg); opacity: 0; } }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #121212; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(45deg, #FF0040, #FF1A5C); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: linear-gradient(45deg, #FF1A5C, #FF0040); }
+        .checklist-item { background: #1A1A1A; border-left: 4px solid rgba(255, 0, 64, 0.3); transition: all 0.3s ease; }
+        .checklist-item:hover { background: #222222; border-left-color: #FF0040; transform: translateX(5px); }
+        .checklist-item.completed { background: rgba(34, 197, 94, 0.1); border-left-color: #22c55e; }
+        .checklist-item.completed label { text-decoration: line-through; color: #888; }
+        .checklist-category h3 { border-bottom: 2px solid rgba(255, 0, 64, 0.3); padding-bottom: 0.5rem; }
+        .custom-checkbox { appearance: none; -webkit-appearance: none; width: 20px; height: 20px; border: 2px solid #555; border-radius: 4px; cursor: pointer; position: relative; transition: all 0.2s ease; }
+        .custom-checkbox:checked { background-color: #FF0040; border-color: #FF0040; }
+        .custom-checkbox:checked::after { content: '\f00c'; font-family: "Font Awesome 6 Free"; font-weight: 900; color: white; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8); }
+    </style>
+</head>
+<body class="antialiased">
+    <!-- Animated Wave Background -->
+    <div class="wave-bg">
+        <svg class="wave-svg" viewBox="0 0 1400 600" preserveAspectRatio="none">
+            <path class="wave-path" d="M-200,150 Q300,80 800,150 T1600,150 L1600,0 L-200,0 Z"/>
+            <path class="wave-path" d="M-200,250 Q400,180 900,250 T1700,250 L1700,0 L-200,0 Z"/>
+            <path class="wave-path" d="M-200,350 Q500,280 1000,350 T1800,350 L1800,0 L-200,0 Z"/>
+        </svg>
+        <!-- Floating Particles -->
+        <div class="particle" style="left: 5%; animation-delay: 0s;"></div>
+        <div class="particle" style="left: 15%; animation-delay: -3s;"></div>
+        <div class="particle" style="left: 25%; animation-delay: -6s;"></div>
+        <div class="particle" style="left: 35%; animation-delay: -9s;"></div>
+        <div class="particle" style="left: 45%; animation-delay: -12s;"></div>
+        <div class="particle" style="left: 55%; animation-delay: -2s;"></div>
+        <div class="particle" style="left: 65%; animation-delay: -5s;"></div>
+        <div class="particle" style="left: 75%; animation-delay: -8s;"></div>
+        <div class="particle" style="left: 85%; animation-delay: -11s;"></div>
+        <div class="particle" style="left: 95%; animation-delay: -14s;"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar fixed top-0 left-0 right-0 z-50" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-3">
+                        <i class="fas fa-shield-alt text-2xl text-red-400"></i>
+                        <h1 class="text-xl font-bold mono">SecTools.az</h1>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="sectools.html" class="hover:text-red-400 transition-colors duration-300">Ana Səhifə</a>
+                    <a href="#" class="text-red-400">Checklist-lər</a>
+                    <a href="about.html" class="hover:text-red-400 transition-colors duration-300">Haqqımızda</a>
+                    <a href="contact.html" class="hover:text-red-400 transition-colors duration-300">Əlaqə</a>
+                </div>
+                <div class="flex items-center md:hidden">
+                     <button id="mobile-menu-button" class="text-white focus:outline-none">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden">
+            <a href="index.html" class="block py-2 px-4 text-sm hover:bg-gray-700">Ana Səhifə</a>
+            <a href="#" class="block py-2 px-4 text-sm bg-gray-700 text-red-400">Checklist-lər</a>
+            <a href="about.html" class="block py-2 px-4 text-sm hover:bg-gray-700">Haqqımızda</a>
+            <a href="contact.html" class="block py-2 px-4 text-sm hover:bg-gray-700">Əlaqə</a>
+        </div>
+    </nav>
+
+    <!-- Comprehensive Pentest Checklist Section -->
+    <section class="min-h-screen py-24 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-5xl mx-auto">
+            <!-- Title Section -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">
+                    <span class="neon-title">Hərtərəfli</span>
+                    <span class="neon-accent mono"> Pentest Checklist-i</span>
+                </h1>
+                <p class="text-lg text-gray-300 max-w-3xl mx-auto">
+                    Kibertəhlükəsizlik testlərinizi növbəti səviyyəyə daşımaq üçün 50 addımlıq detallı yol xəritəsi.
+                </p>
+            </div>
+
+            <!-- Main Checklist Container -->
+            <div class="glass-container rounded-2xl p-6 sm:p-8">
+                <!-- Progress Bar and Stats -->
+                <div class="mb-8">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-bold text-lg text-red-400">Tamamlanma Faizi</span>
+                        <span id="progress-percent" class="font-bold text-lg mono text-white">0%</span>
+                    </div>
+                    <div class="progress-bar h-3">
+                        <div id="progress-fill" class="progress-fill" style="width: 0%;"></div>
+                    </div>
+                     <div class="text-sm text-gray-400 mt-2">
+                        <span id="completed-count">0</span> / <span id="total-count">50</span> tamamlandı
+                    </div>
+                </div>
+
+                <!-- Checklist -->
+                <div id="pentest-checklist" class="space-y-6">
+                    <!-- Category: Information Gathering -->
+                    <div class="checklist-category">
+                        <h3 class="text-2xl font-bold text-white mb-4 mono flex items-center"><i class="fas fa-search text-red-400 mr-3"></i>Məlumat Toplama (10)</h3>
+                        <div class="space-y-3">
+                            <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item1" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item1" class="flex-grow cursor-pointer">Hədəf sistemin (domain, IP aralığı) təyin edilməsi.</label>
+                            </div>
+                            <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item2" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item2" class="flex-grow cursor-pointer">Açıq mənbələrdən (OSINT) məlumatların toplanması (Google Hacking, social media).</label>
+                            </div>
+                            <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item3" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item3" class="flex-grow cursor-pointer">Subdomainlərin aşkarlanması (Sublist3r, Amass).</label>
+                            </div>
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item4" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item4" class="flex-grow cursor-pointer">Whois və DNS qeydlərinin analizi (MX, NS, SOA).</label>
+                            </div>
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item5" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item5" class="flex-grow cursor-pointer">Hədəf texnologiyaların (CMS, framework, web server) müəyyən edilməsi (Wappalyzer, WhatWeb).</label>
+                            </div>
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item6" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item6" class="flex-grow cursor-pointer">Email ünvanlarının və işçi məlumatlarının toplanması.</label>
+                            </div>
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item7" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item7" class="flex-grow cursor-pointer">Shodan/Censys kimi axtarış motorları ilə açıq port və servislərin tapılması.</label>
+                            </div>
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item8" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item8" class="flex-grow cursor-pointer">Web arxivlərinin (Wayback Machine) yoxlanılması.</label>
+                            </div>
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item9" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item9" class="flex-grow cursor-pointer">Sertifikat şəffaflığı (Certificate Transparency) loqlarının analizi.</label>
+                            </div>
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item10" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item10" class="flex-grow cursor-pointer">GitHub/GitLab kimi kod repozitoriyalarında həssas məlumatların axtarışı.</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Category: Scanning & Enumeration -->
+                    <div class="checklist-category">
+                        <h3 class="text-2xl font-bold text-white mb-4 mono flex items-center"><i class="fas fa-crosshairs text-red-400 mr-3"></i>Skan və Nömrələmə (10)</h3>
+                        <div class="space-y-3">
+                            <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item11" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item11" class="flex-grow cursor-pointer">Aktiv hostların müəyyən edilməsi (Ping sweep, Nmap -sn).</label>
+                            </div>
+                            <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item12" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item12" class="flex-grow cursor-pointer">TCP/UDP portlarının skan edilməsi (Nmap, Masscan).</label>
+                            </div>
+                            <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item13" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item13" class="flex-grow cursor-pointer">Servis və versiya məlumatlarının aşkarlanması (Nmap -sV).</label>
+                            </div>
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item14" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item14" class="flex-grow cursor-pointer">Əməliyyat sisteminin təyin edilməsi (Nmap -O).</label>
+                            </div>
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item15" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item15" class="flex-grow cursor-pointer">Web serverlərdə direktoriyaların və faylların "brute-force" edilməsi (Dirb, Gobuster, FFUF).</label>
+                            </div>
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item16" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item16" class="flex-grow cursor-pointer">SMB/NFS paylaşımlarının nömrələnməsi.</label>
+                            </div>
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item17" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item17" class="flex-grow cursor-pointer">SNMP nömrələnməsi (community strings).</label>
+                            </div>
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item18" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item18" class="flex-grow cursor-pointer">SMTP istifadəçilərinin nömrələnməsi (VRFY, EXPN).</label>
+                            </div>
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item19" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item19" class="flex-grow cursor-pointer">API endpoint-lərinin aşkarlanması və nömrələnməsi.</label>
+                            </div>
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item20" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item20" class="flex-grow cursor-pointer">Zəiflik skanerlərinin (Nessus, OpenVAS, Nikto) işə salınması.</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Category: Exploitation -->
+                    <div class="checklist-category">
+                        <h3 class="text-2xl font-bold text-white mb-4 mono flex items-center"><i class="fas fa-bomb text-red-400 mr-3"></i>İstismar (Exploitation) (15)</h3>
+                        <div class="space-y-3">
+                            <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item21" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item21" class="flex-grow cursor-pointer">SQL Injection (In-band, Out-of-band, Blind) testləri.</label>
+                            </div>
+                            <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item22" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item22" class="flex-grow cursor-pointer">Cross-Site Scripting (XSS - Reflected, Stored, DOM-based) yoxlanışı.</label>
+                            </div>
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item23" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item23" class="flex-grow cursor-pointer">Cross-Site Request Forgery (CSRF) zəifliklərinin yoxlanılması.</label>
+                            </div>
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item24" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item24" class="flex-grow cursor-pointer">Server-Side Request Forgery (SSRF) testləri.</label>
+                            </div>
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item25" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item25" class="flex-grow cursor-pointer">XML External Entity (XXE) hücumlarının sınaqdan keçirilməsi.</label>
+                            </div>
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item26" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item26" class="flex-grow cursor-pointer">Təhlükəli fayl yükləmə (Unrestricted File Upload) zəiflikləri.</label>
+                            </div>
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item27" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item27" class="flex-grow cursor-pointer">Authentication və Session Management zəiflikləri (Session fixation, cookie-lərin təhlükəsizliyi).</label>
+                            </div>
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item28" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item28" class="flex-grow cursor-pointer">Parolların "brute-force" və "password spraying" hücumları ilə yoxlanılması (Hydra, Medusa).</label>
+                            </div>
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item29" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item29" class="flex-grow cursor-pointer">Aşkarlanmış zəifliklər üçün mövcud exploitlərin axtarışı (SearchSploit, Exploit-DB).</label>
+                            </div>
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item30" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item30" class="flex-grow cursor-pointer">Metasploit Framework ilə avtomatlaşdırılmış istismar cəhdləri.</label>
+                            </div>
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item31" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item31" class="flex-grow cursor-pointer">Təhlükəli Deserialization zəifliklərinin yoxlanılması.</label>
+                            </div>
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item32" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item32" class="flex-grow cursor-pointer">Directory Traversal / Path Traversal hücumları.</label>
+                            </div>
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item33" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item33" class="flex-grow cursor-pointer">Remote Code Execution (RCE) / Command Injection testləri.</label>
+                            </div>
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item34" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item34" class="flex-grow cursor-pointer">Insecure Direct Object References (IDOR) zəiflikləri.</label>
+                            </div>
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item35" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item35" class="flex-grow cursor-pointer">HTTP Request Smuggling hücumlarının yoxlanılması.</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Category: Post-Exploitation -->
+                    <div class="checklist-category">
+                        <h3 class="text-2xl font-bold text-white mb-4 mono flex items-center"><i class="fas fa-user-secret text-red-400 mr-3"></i>Post-Exploitation (10)</h3>
+                        <div class="space-y-3">
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item36" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item36" class="flex-grow cursor-pointer">Səlahiyyətlərin artırılması (Privilege Escalation) yollarının axtarışı (Kernel exploits, SUID/GUID, misconfigurations).</label>
+                            </div>
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item37" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item37" class="flex-grow cursor-pointer">Sistemdəki həssas faylların (parollar, konfiqurasiya faylları) axtarışı.</label>
+                            </div>
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item38" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item38" class="flex-grow cursor-pointer">Parol hash-lərinin əldə edilməsi və "crack" edilməsi (Mimikatz, Hashcat).</label>
+                            </div>
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item39" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item39" class="flex-grow cursor-pointer">Daxili şəbəkədə yan hərəkət (Lateral Movement) imkanlarının araşdırılması.</label>
+                            </div>
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item40" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item40" class="flex-grow cursor-pointer">Davamlılığın (Persistence) təmin edilməsi (Backdoors, scheduled tasks, services).</label>
+                            </div>
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item41" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item41" class="flex-grow cursor-pointer">Pivoting və port forwarding ilə daxili şəbəkəyə giriş.</label>
+                            </div>
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item42" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item42" class="flex-grow cursor-pointer">Keystroke logger və ekran görüntüsü alətlərinin yerləşdirilməsi.</label>
+                            </div>
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item43" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item43" class="flex-grow cursor-pointer">Loqların və izlərin silinməsi cəhdləri.</label>
+                            </div>
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item44" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item44" class="flex-grow cursor-pointer">Məlumatların xaricə sızdırılması (Data Exfiltration) testləri.</label>
+                            </div>
+                             <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item45" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item45" class="flex-grow cursor-pointer">Daxili şəbəkədəki digər hədəflərin müəyyən edilməsi.</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Category: Reporting -->
+                    <div class="checklist-category">
+                        <h3 class="text-2xl font-bold text-white mb-4 mono flex items-center"><i class="fas fa-file-alt text-red-400 mr-3"></i>Hesabatlılıq (5)</h3>
+                        <div class="space-y-3">
+                            <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item46" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item46" class="flex-grow cursor-pointer">Bütün tapıntıların sənədləşdirilməsi (ekran görüntüləri, loqlar).</label>
+                            </div>
+                            <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item47" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item47" class="flex-grow cursor-pointer">Tapıntıların risk səviyyəsinə görə (CVSS) qiymətləndirilməsi.</label>
+                            </div>
+                            <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item48" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item48" class="flex-grow cursor-pointer">Hər bir zəiflik üçün detallı izah və aradan qaldırma təkliflərinin yazılması.</label>
+                            </div>
+                            <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item49" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item49" class="flex-grow cursor-pointer">İdarəetmə xülasəsi (Executive Summary) və texniki hesabatın hazırlanması.</label>
+                            </div>
+                            <div class="checklist-item p-4 rounded-lg flex items-center">
+                                <input type="checkbox" id="item50" class="custom-checkbox mr-4 flex-shrink-0">
+                                <label for="item50" class="flex-grow cursor-pointer">Hesabatın təhlükəsiz kanallar vasitəsilə müştəriyə təqdim edilməsi.</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="relative py-12 z-10 border-t border-t-gray-800/50 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-400">
+            <p class="mb-2">&copy; 2025 SecTools.az — Kibertəhlükəsizlik üçün alətlər platforması</p>
+            <p class="text-sm">Bütün hüquqlar qorunur.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Navbar scroll effect
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+            
+            // Mobile menu toggle
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // Checklist functionality
+            const checkboxes = document.querySelectorAll('#pentest-checklist .custom-checkbox');
+            const progressFill = document.getElementById('progress-fill');
+            const progressPercent = document.getElementById('progress-percent');
+            const completedCount = document.getElementById('completed-count');
+            const totalCount = document.getElementById('total-count');
+            const totalItems = checkboxes.length;
+
+            totalCount.textContent = totalItems;
+
+            function updateProgress() {
+                const checkedItems = document.querySelectorAll('#pentest-checklist .custom-checkbox:checked').length;
+                const percentage = totalItems > 0 ? (checkedItems / totalItems) * 100 : 0;
+
+                progressFill.style.width = percentage + '%';
+                progressPercent.textContent = Math.round(percentage) + '%';
+                completedCount.textContent = checkedItems;
+                
+                // Save progress to localStorage
+                const checkedIds = Array.from(document.querySelectorAll('#pentest-checklist .custom-checkbox:checked')).map(cb => cb.id);
+                localStorage.setItem('pentestProgress', JSON.stringify(checkedIds));
+            }
+            
+            function loadProgress() {
+                const savedProgress = localStorage.getItem('pentestProgress');
+                if(savedProgress) {
+                    const checkedIds = JSON.parse(savedProgress);
+                    checkedIds.forEach(id => {
+                        const checkbox = document.getElementById(id);
+                        if(checkbox) {
+                           checkbox.checked = true;
+                           checkbox.closest('.checklist-item').classList.add('completed');
+                        }
+                    });
+                }
+                updateProgress();
+            }
+
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    this.closest('.checklist-item').classList.toggle('completed', this.checked);
+                    updateProgress();
+                });
+            });
+            
+            // Initial load
+            loadProgress();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecTools.az - Kibertəhlükəsizlik Alətləri</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Base font for the entire document */
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        /* CSS variables for theming */
+        :root {
+            --primary-dark: #0A0A0A;
+            --secondary-dark: #121212;
+            --card-dark: #1A1A1A;
+            --accent-red: #FF0040;
+            --text-light: #F2F2F2;
+            --glass-bg: rgba(26, 26, 26, 0.4);
+            --glass-border: rgba(255, 0, 64, 0.2);
+        }
+        
+        /* Dark theme styles */
+        body.dark {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--secondary-dark) 100%);
+            color: var(--text-light);
+        }
+        
+        /* Light theme styles */
+        body.light {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            color: #1a1a1a;
+            --glass-bg: rgba(255, 255, 255, 0.4);
+            --glass-border: rgba(255, 0, 64, 0.3);
+            --text-light: #1a1a1a; /* Adjust text color for light mode */
+        }
+
+        body.light .text-gray-300 { color: #4a5568; }
+        body.light .text-gray-400 { color: #718096; }
+        body.light .text-white { color: #1a1a1a; }
+        body.light .red-neon { color: #e53e3e; text-shadow: none; }
+        body.light .glass-card, body.light .glass { background: rgba(255, 255, 255, 0.6); }
+
+        
+        /* Glassmorphism effect for elements */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+        }
+        
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 0, 64, 0.1);
+        }
+        
+        /* Glow effect for highlighted elements */
+        .red-glow {
+            box-shadow: 0 0 30px rgba(255, 0, 64, 0.4);
+            border: 1px solid var(--accent-red);
+        }
+        
+        /* Neon text effect */
+        .red-neon {
+            color: var(--accent-red);
+            text-shadow: 0 0 15px rgba(255, 0, 64, 0.6);
+        }
+        
+        /* Animated wave background */
+        .wave-bg {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .wave-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.2;
+            z-index: 1;
+        }
+        
+        .wave-line {
+            stroke: var(--accent-red);
+            stroke-width: 2;
+            fill: none;
+            filter: drop-shadow(0 0 8px rgba(255, 0, 64, 0.8));
+        }
+        
+        .wave-1 { animation: wave-flow-1 15s ease-in-out infinite; }
+        .wave-2 { animation: wave-flow-2 18s ease-in-out infinite reverse; }
+        .wave-3 { animation: wave-flow-3 12s ease-in-out infinite; }
+        
+        @keyframes wave-flow-1 {
+            0%, 100% { d: path("M0,50 Q300,20 600,50 T1200,50"); }
+            50% { d: path("M0,50 Q300,80 600,50 T1200,50"); }
+        }
+        
+        @keyframes wave-flow-2 {
+            0%, 100% { d: path("M0,60 Q250,30 500,60 T1000,60"); }
+            50% { d: path("M0,60 Q250,90 500,60 T1000,60"); }
+        }
+        
+        @keyframes wave-flow-3 {
+            0%, 100% { d: path("M0,40 Q400,10 800,40 T1600,40"); }
+            50% { d: path("M0,40 Q400,70 800,40 T1600,40"); }
+        }
+        
+        /* Simple floating animation */
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        /* Fade-in animation */
+        .fade-in-up {
+            animation: fadeInUp 0.8s ease-out forwards;
+            opacity: 0; /* Start hidden */
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Tool card hover effects */
+        .tool-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(0);
+        }
+        
+        .tool-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(255, 0, 64, 0.3);
+            border-color: var(--accent-red);
+        }
+        
+        /* Category accordion styles */
+        .category-header {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .category-header:hover {
+            background: rgba(255, 0, 64, 0.1);
+            border-color: var(--accent-red);
+            box-shadow: 0 0 20px rgba(255, 0, 64, 0.2);
+        }
+        
+        .category-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .category-content.open {
+            max-height: 5000px; /* Large value to accommodate content */
+        }
+
+        .arrow-icon.rotate-180 {
+            transform: rotate(180deg);
+        }
+        
+        /* Navbar shrink effect on scroll */
+        .navbar-shrink {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Input field focus effect */
+        .glow-input:focus {
+            box-shadow: 0 0 25px rgba(255, 0, 64, 0.4);
+            border-color: var(--accent-red);
+            outline: none;
+        }
+        
+        /* Primary button styles */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-red), #cc0033);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            color: #fff;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(255, 0, 64, 0.4);
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+        
+        /* Theme toggle switch */
+        .theme-toggle {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: var(--card-dark);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 0, 64, 0.3);
+        }
+        
+        .theme-toggle::before {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background: var(--accent-red);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(255, 0, 64, 0.6);
+        }
+        
+        .theme-toggle.active::before {
+            transform: translateX(30px);
+            background: #ffd700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+        }
+        
+        /* Utility class to hide tools during search */
+        .hidden-tool {
+            display: none !important;
+        }
+        
+        /* Cyber grid background pattern */
+        .cyber-grid {
+            background-image: 
+                linear-gradient(rgba(255, 0, 64, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 0, 64, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+        
+        /* Timeline styles for checklist */
+        .step-timeline {
+            position: relative;
+        }
+        
+        .step-timeline::before {
+            content: '';
+            position: absolute;
+            left: 30px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, var(--accent-red), transparent);
+            border-radius: 2px;
+        }
+        
+        .step-item {
+            position: relative;
+            padding-left: 80px;
+            margin-bottom: 40px;
+            opacity: 0.5;
+            transition: all 0.6s ease;
+        }
+        
+        .step-item.active {
+            opacity: 1;
+            transform: translateX(15px);
+        }
+        
+        .step-item::before {
+            content: '';
+            position: absolute;
+            left: 18px;
+            top: 15px;
+            width: 24px;
+            height: 24px;
+            background: var(--accent-red);
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(255, 0, 64, 0.6);
+            transition: all 0.3s ease;
+        }
+        
+        .step-item.active::before {
+            transform: scale(1.2);
+            box-shadow: 0 0 30px rgba(255, 0, 64, 0.8);
+        }
+        
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+        }
+        
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .modal-content {
+            background: var(--secondary-dark); /* Darker background for modal */
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: scaleIn 0.3s ease-out;
+            color: var(--text-light); /* Ensure text is light in modal */
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        /* Tool icon styling */
+        .tool-icon {
+            font-size: 2rem;
+            filter: drop-shadow(0 0 10px rgba(255, 0, 64, 0.5));
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .wave-animation {
+                opacity: 0.1;
+            }
+            .tool-card:hover {
+                transform: translateY(-4px) scale(1.01);
+            }
+            .step-item {
+                padding-left: 60px;
+            }
+        }
+    </style>
+</head>
+<body class="dark transition-all duration-500">
+    <!-- Animated Background -->
+    <div class="fixed inset-0 wave-bg cyber-grid -z-10">
+        <svg class="wave-animation" viewBox="0 0 1200 100" preserveAspectRatio="none">
+            <path class="wave-line wave-1" d="M0,50 Q300,20 600,50 T1200,50" />
+            <path class="wave-line wave-2" d="M0,60 Q250,30 500,60 T1000,60" />
+            <path class="wave-line wave-3" d="M0,40 Q400,10 800,40 T1600,40" />
+        </svg>
+    </div>
+
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed top-0 w-full glass z-50 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3 floating">
+                    <div class="w-12 h-12 red-glow rounded-xl flex items-center justify-center">
+                        <span class="text-2xl">🛡️</span>
+                    </div>
+                    <div class="text-2xl font-bold red-neon">SecTools.az</div>
+                </div>
+
+                <!-- Menu -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="about.html" class="text-gray-300 hover:text-red-400 transition-colors duration-200 font-medium">Haqqımızda</a>
+                    <a href="install.html" class="text-gray-300 hover:text-red-400 transition-colors duration-200 font-medium">Alətlər</a>
+                    <a href="checklist.html" class="text-gray-300 hover:text-red-400 transition-colors duration-200 font-medium">CheckList</a>
+                    <a href="contact.html" class="text-gray-300 hover:text-red-400 transition-colors duration-200 font-medium">Əlaqə</a>
+                </div>
+
+                <!-- Search & Theme Toggle -->
+                <div class="flex items-center space-x-4">
+                    <div class="relative hidden sm:block">
+                        <input 
+                            type="text" 
+                            id="searchInput"
+                            placeholder="Alət axtarın..." 
+                            class="w-64 px-4 py-2 pl-10 glass rounded-xl glow-input transition-all duration-200"
+                        >
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="theme-toggle" onclick="toggleTheme()"></div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="relative min-h-screen flex items-center justify-center pt-16 wave-bg">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
+            <div class="fade-in-up">
+                <h1 class="text-6xl md:text-8xl font-bold mb-8">
+                    <span class="red-neon">Kiber</span>təhlükəsizlik
+                    <br>
+                    <span class="text-4xl md:text-6xl text-white">Alətləri</span>
+                </h1>
+                <p class="text-xl md:text-2xl text-gray-300 mb-10 leading-relaxed max-w-4xl mx-auto">
+                    100+ peşəkar penetrasiya testləri və təhlükəsizlik auditləri üçün 
+                    <span class="red-neon">ən güclü Kali Linux alətləri</span> və kibertəhlükəsizlik həlləri
+                </p>
+                <div class="flex flex-col sm:flex-row gap-6 justify-center">
+                    <button onclick="document.getElementById('tools').scrollIntoView({behavior: 'smooth'})" 
+                            class="btn-primary px-10 py-5 rounded-2xl font-semibold text-xl">
+                        Alətləri Kəşf Et
+                    </button>
+                    <button onclick="document.getElementById('checklist').scrollIntoView({behavior: 'smooth'})" 
+                            class="glass px-10 py-5 rounded-2xl font-semibold text-xl text-white hover:red-glow transition-all duration-300">
+                        PenTest Yol Xəritəsi
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tools Section -->
+    <section id="tools" class="relative py-20 z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 fade-in-up">
+                <h2 class="text-5xl md:text-6xl font-bold mb-6">
+                    <span class="red-neon">Alət</span> Kateqoriyaları
+                </h2>
+                <p class="text-xl text-gray-400">100+ alət 12 kateqoriyada təsnif edilib</p>
+            </div>
+
+            <!-- Categories Container -->
+            <div class="space-y-6" id="categories-container">
+                <!-- Categories will be dynamically inserted here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- CheckList Section -->
+    <section id="checklist" class="relative py-20 z-10 wave-bg">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 fade-in-up">
+                <h2 class="text-5xl md:text-6xl font-bold mb-6">
+                    <span class="red-neon">PenTest</span> Yol Xəritəsi
+                </h2>
+                <p class="text-xl text-gray-400">Penetrasiya testinin mərhələləri</p>
+            </div>
+
+            <div class="glass-card rounded-3xl p-10">
+                <div class="step-timeline">
+                    <div class="step-item active" data-step="1">
+                        <h3 class="text-2xl font-bold mb-3 red-neon">1. Məlumat Toplama</h3>
+                        <p class="text-gray-300 text-lg mb-2">Hədəf sistem haqqında ətraflı məlumat toplama və kəşfiyyat</p>
+                        <div class="text-sm text-gray-400">Nmap, theHarvester, Recon-ng, Shodan</div>
+                    </div>
+                    
+                    <div class="step-item" data-step="2">
+                        <h3 class="text-2xl font-bold mb-3">2. Zəiflik Analizi</h3>
+                        <p class="text-gray-300 text-lg mb-2">Sistemdəki zəiflikləri aşkar etmə və qiymətləndirmə</p>
+                        <div class="text-sm text-gray-400">OpenVAS, Nikto, OWASP ZAP, Nuclei</div>
+                    </div>
+                    
+                    <div class="step-item" data-step="3">
+                        <h3 class="text-2xl font-bold mb-3">3. İstismar Etmə</h3>
+                        <p class="text-gray-300 text-lg mb-2">Aşkar edilən zəiflikləri istismar etmə</p>
+                        <div class="text-sm text-gray-400">Metasploit, SQLmap, BeEF</div>
+                    </div>
+                    
+                    <div class="step-item" data-step="4">
+                        <h3 class="text-2xl font-bold mb-3">4. Post-Exploitation</h3>
+                        <p class="text-gray-300 text-lg mb-2">Sistemə daxil olduqdan sonra əlavə məlumat toplama</p>
+                        <div class="text-sm text-gray-400">Empire, Mimikatz, PowerSploit</div>
+                    </div>
+                    
+                    <div class="step-item" data-step="5">
+                        <h3 class="text-2xl font-bold mb-3">5. Hesabat Hazırlama</h3>
+                        <p class="text-gray-300 text-lg mb-2">Tapılan zəifliklərin ətraflı hesabatının hazırlanması</p>
+                        <div class="text-sm text-gray-400">Dradis, Faraday, KeepNote</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="relative py-20 z-10">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 fade-in-up">
+                <h2 class="text-5xl font-bold mb-6">
+                    <span class="red-neon">Bizimlə</span> Əlaqə
+                </h2>
+                <p class="text-xl text-gray-400">Yeni alət təklif edin və ya bizimlə əlaqə saxlayın</p>
+            </div>
+
+            <div class="glass-card rounded-3xl p-10 fade-in-up">
+                <form id="contactForm" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-lg font-medium mb-3 text-white">Ad</label>
+                            <input type="text" required class="w-full px-6 py-4 glass rounded-2xl glow-input transition-all duration-200 text-lg" placeholder="Adınızı daxil edin">
+                        </div>
+                        <div>
+                            <label class="block text-lg font-medium mb-3 text-white">Email</label>
+                            <input type="email" required class="w-full px-6 py-4 glass rounded-2xl glow-input transition-all duration-200 text-lg" placeholder="Email ünvanınız">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-lg font-medium mb-3 text-white">Alət Adı</label>
+                            <input type="text" class="w-full px-6 py-4 glass rounded-2xl glow-input transition-all duration-200 text-lg" placeholder="Təklif etdiyiniz alət">
+                        </div>
+                        <div>
+                            <label class="block text-lg font-medium mb-3 text-white">GitHub Linki</label>
+                            <input type="url" class="w-full px-6 py-4 glass rounded-2xl glow-input transition-all duration-200 text-lg" placeholder="https://github.com/...">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-lg font-medium mb-3 text-white">Qısa İzah</label>
+                        <textarea rows="5" required class="w-full px-6 py-4 glass rounded-2xl glow-input transition-all duration-200 resize-none text-lg" placeholder="Alət haqqında qısa məlumat və ya mesajınız"></textarea>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn-primary px-12 py-5 rounded-2xl font-semibold text-xl">
+                            Təklif Göndər
+                        </button>
+                    </div>
+                </form>
+                 <p id="form-message" class="text-center text-green-400 mt-4 text-lg"></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="relative py-16 z-10 border-t border-gray-700/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="flex items-center justify-center space-x-4 mb-8 floating">
+                <div class="w-16 h-16 red-glow rounded-2xl flex items-center justify-center">
+                    <span class="text-3xl">🛡️</span>
+                </div>
+                <div class="text-4xl font-bold red-neon">SecTools.az</div>
+            </div>
+            <p class="text-xl text-gray-400 mb-10">Kibertəhlükəsizlik üçün alətlər platforması</p>
+            <div class="flex justify-center space-x-8 mb-10">
+                <a href="#" class="text-gray-400 hover:text-red-400 transition-colors duration-200 transform hover:scale-110">
+                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                </a>
+                <!-- Other social icons here -->
+            </div>
+            <div class="border-t border-gray-700/50 pt-8">
+                <p class="text-gray-400 text-lg">© 2025 SecTools.az — Kibertəhlükəsizlik üçün alətlər platforması</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Tool Detail Modal -->
+    <div id="toolModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="modalTitle" class="text-3xl font-bold red-neon"></h2>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-red-400 text-4xl font-light">&times;</button>
+            </div>
+            <div id="modalContent" class="space-y-4"></div>
+        </div>
+    </div>
+
+<script>
+// --- DATA ---
+const categories = {
+    'info-gathering': { title: 'Məlumat Toplama', description: 'Hədəf sistemlər haqqında məlumat toplama alətləri', icon: '🔍' },
+    'vulnerability': { title: 'Zəiflik Analizi', description: 'Sistem zəifliklərini aşkar etmə alətləri', icon: '🛡️' },
+    'web-testing': { title: 'Web Test Alətləri', description: 'Web tətbiqi təhlükəsizlik test alətləri', icon: '🌐' },
+    'exploitation': { title: 'İstismar Alətləri', description: 'Zəiflikləri istismar etmə alətləri', icon: '⚔️' },
+    'password': { title: 'Parol Qırma', description: 'Parol təhlükəsizliyini test etmə alətləri', icon: '🔐' },
+    'wireless': { title: 'Simsiz Hücumlar', description: 'WiFi və simsiz şəbəkə təhlükəsizlik alətləri', icon: '📡' },
+    'reverse-engineering': { title: 'Reverse Engineering', description: 'Proqram təhlili və reverse engineering alətləri', icon: '🔧' },
+    'post-exploitation': { title: 'İstismardan Sonra', description: 'Post-exploitation alətləri', icon: '🎯' },
+    'forensics': { title: 'Forensika və OSINT', description: 'Rəqəmsal forensika və açıq mənbə kəşfiyyatı', icon: '🔬' },
+    'social-engineering': { title: 'Sosial Mühəndislik', description: 'İnsan faktorunu test etmə alətləri', icon: '👥' },
+    'network-analysis': { title: 'Şəbəkə Analizi', description: 'Şəbəkə trafikini analiz etmə alətləri', icon: '📶' },
+    'miscellaneous': { title: 'Digər Alətlər', description: 'Müxtəlif köməkçi alətlər', icon: '🛠️' }
+};
+
+const toolsData = {
+    'info-gathering': [
+        { name: 'Nmap', description: 'Şəbəkə kəşfiyyatı və port skaneri', github: 'https://github.com/nmap/nmap', details: 'Nmap (Network Mapper) şəbəkə kəşfiyyatı və təhlükəsizlik auditləri üçün açıq mənbəli alətdir.', command: 'nmap -sS -O target_ip', installation: 'Kali Linux-da əvvəlcədən quraşdırılıb' },
+        { name: 'theHarvester', description: 'E-mail və subdomain toplama', github: 'https://github.com/laramies/theHarvester', details: 'theHarvester müxtəlif mənbələrdən e-mail ünvanları və subdomain-lər toplamaq üçün istifadə olunur.', command: 'theHarvester -d domain.com -b google', installation: 'Kali Linux-da əvvəlcədən quraşdırılıb' },
+        { name: 'Recon-ng', description: 'Web məlumat toplama çərçivəsi', github: 'https://github.com/lanmaster53/recon-ng', details: 'Recon-ng web məlumat toplama üçün modular çərçivədir.', command: 'recon-ng', installation: 'Kali Linux-da əvvəlcədən quraşdırılıb' },
+        { name: 'Shodan CLI', description: 'İnternet cihazları axtarışı', github: 'https://github.com/achillean/shodan-python', details: 'Shodan CLI internet-ə qoşulmuş cihazları axtarmaq üçün istifadə olunur.', command: 'shodan search apache', installation: 'pip install shodan' },
+        { name: 'Subfinder', description: 'Subdomain kəşfiyyat aləti', github: 'https://github.com/projectdiscovery/subfinder', details: 'Subfinder passiv subdomain kəşfiyyatı üçün sürətli alətdir.', command: 'subfinder -d domain.com', installation: 'go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest' },
+        { name: 'Amass', description: 'Şəbəkə xəritələmə aləti', github: 'https://github.com/OWASP/Amass', details: 'OWASP Amass şəbəkə xəritələmə və hədəf kəşfiyyatı üçün alətdir.', command: 'amass enum -d domain.com', installation: 'Kali Linux-da əvvəlcədən quraşdırılıb' },
+    ],
+    'vulnerability': [
+        { name: 'Nikto', description: 'Web server skaneri', github: 'https://github.com/sullo/nikto', details: 'Nikto web serverlərdəki zəiflikləri, köhnəlmiş proqramları və digər təhlükəsizlik problemlərini skan edir.', command: 'nikto -h http://target.com', installation: 'Kali Linux-da əvvəlcədən quraşdırılıb' },
+        { name: 'OpenVAS', description: 'Zəiflik skaneri', github: 'https://github.com/greenbone/openvas-scanner', details: 'OpenVAS (Greenbone Vulnerability Manager) hərtərəfli zəiflik skaneri və idarəetmə alətidir.', command: 'GUI vasitəsilə istifadə olunur', installation: 'apt-get install gvm' },
+        { name: 'Nuclei', description: 'Templat-əsaslı skaner', github: 'https://github.com/projectdiscovery/nuclei', details: 'Nuclei YAML templatləri əsasında çalışan, sürətli və fərdiləşdirilə bilən zəiflik skaneridir.', command: 'nuclei -u http://target.com -t nuclei-templates/', installation: 'go install -v github.com/projectdiscovery/nuclei/v2/cmd/nuclei@latest' },
+    ],
+    'web-testing': [
+        { name: 'Burp Suite', description: 'Web tətbiqi test platforması', github: 'https://portswigger.net/burp', details: 'Burp Suite web tətbiqi təhlükəsizliyini test etmək üçün inteqrasiya olunmuş platformadır.', command: 'GUI vasitəsilə istifadə olunur', installation: 'Kali Linux-da Community Edition var' },
+        { name: 'OWASP ZAP', description: 'Web tətbiqi təhlükəsizlik skaneri', github: 'https://github.com/zaproxy/zaproxy', details: 'OWASP Zed Attack Proxy (ZAP) web tətbiqlərindəki zəiflikləri tapmaq üçün istifadə olunan açıq mənbəli alətdir.', command: 'GUI vasitəsilə istifadə olunur', installation: 'Kali Linux-da əvvəlcədən quraşdırılıb' },
+        { name: 'Gobuster', description: 'Directory/fayl brute-forcer', github: 'https://github.com/OJ/gobuster', details: 'Gobuster web serverlərdəki gizli direktoriyaları və faylları tapmaq üçün istifadə olunur.', command: 'gobuster dir -u http://target.com -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt', installation: 'Kali Linux-da əvvəlcədən quraşdırılıb' },
+    ],
+    'exploitation': [
+        { name: 'Metasploit Framework', description: 'İstismar çərçivəsi', github: 'https://github.com/rapid7/metasploit-framework', details: 'Metasploit zəiflikləri istismar etmək, payload yaratmaq və təhlükəsizlik testləri aparmaq üçün ən populyar çərçivədir.', command: 'msfconsole', installation: 'Kali Linux-da əvvəlcədən quraşdırılıb' },
+        { name: 'SQLmap', description: 'SQL injection avtomatlaşdırma', github: 'https://github.com/sqlmapproject/sqlmap', details: 'SQLmap SQL injection zəifliklərini avtomatik olaraq aşkar edən və istismar edən güclü alətdir.', command: 'sqlmap -u "http://target.com/vuln.php?id=1"', installation: 'Kali Linux-da əvvəlcədən quraşdırılıb' },
+        { name: 'BeEF', description: 'Brauzer istismar çərçivəsi', github: 'https://github.com/beefproject/beef', details: 'The Browser Exploitation Framework (BeEF) web brauzerlərini hədəf alan güclü bir alətdir.', command: 'beef-xss', installation: 'Kali Linux-da əvvəlcədən quraşdırılıb' },
+    ],
+    'password': [
+        { name: 'John the Ripper', description: 'Parol qırma aləti', github: 'https://github.com/openwall/john', details: 'John the Ripper müxtəlif formatlardakı parol hash-lərini qırmaq üçün istifadə olunan sürətli parol qırma alətidir.', command: 'john --wordlist=pass.txt hash.txt', installation: 'Kali Linux-da əvvəlcədən quraşdırılıb' },
+        { name: 'Hashcat', description: 'Qabaqcıl parol qırma', github: 'https://github.com/hashcat/hashcat', details: 'Hashcat dünyanın ən sürətli və qabaqcıl parol qırma aləti hesab olunur, GPU-dan istifadə edir.', command: 'hashcat -m 0 -a 0 hash.txt pass.txt', installation: 'Kali Linux-da əvvəlcədən quraşdırılıb' },
+        { name: 'Hydra', description: 'Online parol hücum aləti', github: 'https://github.com/vanhauser-thc/thc-hydra', details: 'Hydra müxtəlif protokollara (HTTP, FTP, SSH və s.) qarşı online brute-force hücumları həyata keçirir.', command: 'hydra -l user -P pass.txt ssh://target.com', installation: 'Kali Linux-da əvvəlcədən quraşdırılıb' },
+    ],
+    'wireless': [
+        { name: 'Aircrack-ng', description: 'WiFi təhlükəsizlik paketi', github: 'https://github.com/aircrack-ng/aircrack-ng', details: 'Aircrack-ng WiFi şəbəkələrini monitorinq etmək, paketləri tutmaq və WEP/WPA/WPA2 parollarını qırmaq üçün alətlər toplusudur.', command: 'airmon-ng start wlan0', installation: 'Kali Linux-da əvvəlcədən quraşdırılıb' },
+        { name: 'Kismet', description: 'Simsiz şəbəkə detektoru', github: 'https://github.com/kismetwireless/kismet', details: 'Kismet simsiz şəbəkə detektoru, sniffer və intrusion detection sistemidir.', command: 'kismet', installation: 'Kali Linux-da əvvəlcədən quraşdırılıb' },
+        { name: 'Reaver', description: 'WPS brute-force hücumu', github: 'https://github.com/t6x/reaver-wps-fork-t6x', details: 'Reaver WPS (Wi-Fi Protected Setup) PIN kodunu brute-force edərək WPA/WPA2 parollarını əldə edir.', command: 'reaver -i wlan0mon -b BSSID -vv', installation: 'Kali Linux-da əvvəlcədən quraşdırılıb' },
+    ],
+    'reverse-engineering': [
+        { name: 'Ghidra', description: 'NSA tərəfindən proqram təhlili', github: 'https://github.com/NationalSecurityAgency/ghidra', details: 'Ghidra NSA tərəfindən hazırlanmış, proqramların reverse engineering prosesi üçün güclü və pulsuz bir alətdir.', command: 'GUI vasitəsilə istifadə olunur', installation: 'Rəsmi saytdan yüklənir' },
+        { name: 'Radare2', description: 'Reverse engineering çərçivəsi', github: 'https://github.com/radareorg/radare2', details: 'Radare2 proqramları analiz etmək, disassembl etmək və debug etmək üçün komanda sətri əsaslı güclü bir çərçivədir.', command: 'r2 -d program', installation: 'Kali Linux-da əvvəlcədən quraşdırılıb' },
+    ],
+    'post-exploitation': [
+        { name: 'Empire', description: 'Post-exploitation agenti', github: 'https://github.com/BC-SECURITY/Empire', details: 'Empire PowerShell və Python əsaslı post-exploitation agentidir.', command: 'powershell-empire', installation: 'git clone https://github.com/BC-SECURITY/Empire.git' },
+        { name: 'Mimikatz', description: 'Windows parollarını əldə etmə', github: 'https://github.com/gentilkiwi/mimikatz', details: 'Mimikatz Windows yaddaşından parol, hash və Kerberos biletlərini çıxarmaq üçün istifadə olunur.', command: 'mimikatz.exe "privilege::debug" "sekurlsa::logonpasswords"', installation: 'Rəsmi GitHub-dan yüklənir' },
+    ],
+    'forensics': [
+        { name: 'Autopsy', description: 'Rəqəmsal forensika platforması', github: 'https://github.com/sleuthkit/autopsy', details: 'Autopsy rəqəmsal forensika üçün qrafik interfeysi olan güclü və istifadəsi asan platformadır.', command: 'autopsy', installation: 'Kali Linux-da əvvəlcədən quraşdırılıb' },
+        { name: 'Volatility', description: 'Yaddaş forensika çərçivəsi', github: 'https://github.com/volatilityfoundation/volatility', details: 'Volatility yaddaş dump-larını analiz etmək üçün açıq mənbəli forensika çərçivəsidir.', command: 'volatility -f memory.dump imageinfo', installation: 'Kali Linux-da əvvəlcədən quraşdırılıb' },
+        { name: 'Sherlock', description: 'Sosial media istifadəçi axtarışı', github: 'https://github.com/sherlock-project/sherlock', details: 'Sherlock müxtəlif sosial media platformalarında müəyyən istifadəçi adının mövcudluğunu yoxlayır.', command: 'python3 sherlock.py username', installation: 'git clone https://github.com/sherlock-project/sherlock.git' },
+    ],
+    'social-engineering': [
+        { name: 'Social-Engineer Toolkit (SET)', description: 'Sosial mühəndislik hücumları', github: 'https://github.com/trustedsec/social-engineer-toolkit', details: 'SET sosial mühəndislik hücumlarını (məsələn, phishing) avtomatlaşdırmaq üçün hazırlanmış bir çərçivədir.', command: 'setoolkit', installation: 'Kali Linux-da əvvəlcədən quraşdırılıb' },
+    ],
+    'network-analysis': [
+        { name: 'Wireshark', description: 'Şəbəkə protokol analizatoru', github: 'https://github.com/wireshark/wireshark', details: 'Wireshark şəbəkə trafikini real vaxtda tutmaq və analiz etmək üçün ən populyar alətdir.', command: 'wireshark', installation: 'Kali Linux-da əvvəlcədən quraşdırılıb' },
+        { name: 'tcpdump', description: 'Komanda sətri paket analizatoru', github: 'https://www.tcpdump.org/', details: 'tcpdump şəbəkə trafikini komanda sətrindən tutmaq və analiz etmək üçün güclü bir alətdir.', command: 'tcpdump -i eth0', installation: 'Kali Linux-da əvvəlcədən quraşdırılıb' },
+    ],
+    'miscellaneous': [
+        { name: 'Tor', description: 'Anonim şəbəkə', github: 'https://github.com/torproject/tor', details: 'Tor istifadəçilərin internet trafikini anonimləşdirən və məxfiliyi qoruyan bir şəbəkədir.', command: 'service tor start', installation: 'Kali Linux-da əvvəlcədən quraşdırılıb' },
+        { name: 'ProxyChains', description: 'Proxy yönləndirici', github: 'https://github.com/haad/proxychains', details: 'ProxyChains istənilən TCP bağlantısını TOR, SOCKS4/5 və ya HTTP proxy-lər vasitəsilə yönləndirməyə imkan verir.', command: 'proxychains nmap target.com', installation: 'Kali Linux-da əvvəlcədən quraşdırılıb' },
+    ]
+};
+
+// --- CORE LOGIC ---
+document.addEventListener('DOMContentLoaded', () => {
+    // --- INITIALIZATION ---
+    populateCategoriesAndTools();
+    setupEventListeners();
+    handleInitialAnimations();
+});
+
+function populateCategoriesAndTools() {
+    const categoriesContainer = document.getElementById('categories-container');
+    if (!categoriesContainer) return;
+
+    let allHtml = '';
+    for (const catId in categories) {
+        const category = categories[catId];
+        const tools = toolsData[catId] || [];
+
+        // Create HTML for tools in this category
+        const toolsHtml = tools.map(tool => createToolCard(tool, catId)).join('');
+
+        // Create HTML for the entire category section
+        allHtml += `
+            <div class="glass-card rounded-2xl overflow-hidden fade-in-up" style="animation-delay: ${Object.keys(categories).indexOf(catId) * 100}ms;">
+                <div class="category-header p-6" onclick="toggleCategory('${catId}')">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-14 h-14 red-glow rounded-xl flex items-center justify-center floating">
+                                <span class="tool-icon">${category.icon}</span>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold red-neon">${category.title}</h3>
+                                <p class="text-gray-400">${category.description}</p>
+                            </div>
+                        </div>
+                        <svg class="w-6 h-6 transform transition-transform duration-300 arrow-icon" id="arrow-${catId}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="category-content" id="content-${catId}">
+                    <div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        ${toolsHtml}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    categoriesContainer.innerHTML = allHtml;
+}
+
+function createToolCard(tool, categoryId) {
+    // Note: JSON.stringify escapes quotes, making it safe to use in an attribute.
+    const toolDataString = JSON.stringify(tool).replace(/"/g, '&quot;');
+    return `
+        <div class="tool-card glass p-5 rounded-xl flex flex-col h-full" data-name="${tool.name.toLowerCase()}" data-description="${tool.description.toLowerCase()}" data-category="${categoryId}">
+            <div class="flex items-center space-x-4 mb-4">
+                <div class="w-12 h-12 red-glow rounded-lg flex items-center justify-center text-2xl">${categories[categoryId].icon}</div>
+                <div>
+                    <h4 class="text-xl font-bold text-white">${tool.name}</h4>
+                    <p class="text-gray-400">${tool.description}</p>
+                </div>
+            </div>
+            <div class="flex-grow"></div>
+            <div class="mt-4 flex justify-end">
+                <button onclick='openModal(${toolDataString})' class="btn-primary px-4 py-2 text-sm rounded-lg">
+                    Ətraflı
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+// --- EVENT LISTENERS & HANDLERS ---
+function setupEventListeners() {
+    // Search input
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('input', filterTools);
+
+    // Navbar shrink on scroll
+    window.addEventListener('scroll', handleScrollAnimations);
+    
+    // Close modal on outside click
+    const modal = document.getElementById('toolModal');
+    modal.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            closeModal();
+        }
+    });
+
+    // Contact form submission
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const messageEl = document.getElementById('form-message');
+        messageEl.textContent = 'Təklifiniz göndərildi! Təşəkkür edirik.';
+        this.reset();
+        setTimeout(() => { messageEl.textContent = ''; }, 3000);
+    });
+}
+
+function handleScrollAnimations() {
+    // Navbar
+    const navbar = document.getElementById('navbar');
+    if (window.scrollY > 50) {
+        navbar.classList.add('navbar-shrink');
+    } else {
+        navbar.classList.remove('navbar-shrink');
+    }
+
+    // Checklist animation
+    const steps = document.querySelectorAll('.step-item');
+    const triggerBottom = window.innerHeight * 0.8;
+    
+    steps.forEach(step => {
+        const boxTop = step.getBoundingClientRect().top;
+        if (boxTop < triggerBottom && boxTop > 0) {
+            // Remove active from all siblings first
+            steps.forEach(s => {
+                s.classList.remove('active');
+                s.querySelector('h3').classList.remove('red-neon');
+            });
+            // Add active to the current one
+            step.classList.add('active');
+            step.querySelector('h3').classList.add('red-neon');
+        }
+    });
+}
+
+function handleInitialAnimations() {
+    // Trigger fade-in for elements that are already in view on load
+    const elements = document.querySelectorAll('.fade-in-up');
+    elements.forEach(el => {
+        // Use a small timeout to ensure animation runs
+        setTimeout(() => el.style.opacity = 1, 100);
+    });
+}
+
+// --- UI FUNCTIONS ---
+
+function toggleCategory(categoryId) {
+    const content = document.getElementById(`content-${categoryId}`);
+    const arrow = document.getElementById(`arrow-${categoryId}`);
+    if (content && arrow) {
+        content.classList.toggle('open');
+        arrow.classList.toggle('rotate-180');
+    }
+}
+
+function toggleTheme() {
+    const body = document.body;
+    const toggle = document.querySelector('.theme-toggle');
+    body.classList.toggle('light');
+    body.classList.toggle('dark');
+    toggle.classList.toggle('active');
+}
+
+function filterTools() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const allTools = document.querySelectorAll('.tool-card');
+
+    allTools.forEach(toolCard => {
+        const name = toolCard.dataset.name;
+        const description = toolCard.dataset.description;
+        if (name.includes(searchTerm) || description.includes(searchTerm)) {
+            toolCard.classList.remove('hidden-tool');
+        } else {
+            toolCard.classList.add('hidden-tool');
+        }
+    });
+}
+
+// --- MODAL ---
+const modal = document.getElementById('toolModal');
+const modalTitle = document.getElementById('modalTitle');
+const modalContent = document.getElementById('modalContent');
+
+function openModal(tool) {
+    if (!tool) return;
+    modalTitle.textContent = tool.name;
+    modalContent.innerHTML = `
+        <p class="text-lg text-gray-300">${tool.details}</p>
+        <div>
+            <h4 class="font-bold text-xl red-neon mb-2 mt-4">Quraşdırma:</h4>
+            <pre class="glass p-4 rounded-lg text-gray-300 overflow-x-auto"><code>${tool.installation}</code></pre>
+        </div>
+        <div>
+            <h4 class="font-bold text-xl red-neon mb-2 mt-4">Nümunə Əmr:</h4>
+            <pre class="glass p-4 rounded-lg text-gray-300 overflow-x-auto"><code>${tool.command}</code></pre>
+        </div>
+        <div class="mt-6 text-right">
+            <a href="${tool.github}" target="_blank" rel="noopener noreferrer" class="btn-primary px-6 py-3 rounded-xl font-semibold text-lg inline-block">
+                GitHub-da Bax
+            </a>
+        </div>
+    `;
+    modal.classList.add('show');
+}
+
+function closeModal() {
+    modal.classList.remove('show');
+}
+
+</script>
+</body>
+</html>

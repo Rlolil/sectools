@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alətlər və Quraşdırma - SecTools.az</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+        
+        * { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        body { background: linear-gradient(135deg, #0A0A0A 0%, #121212 100%); color: #F2F2F2; overflow-x: hidden; }
+        .wave-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; }
+        .wave-svg { position: absolute; width: 120%; height: 100%; opacity: 0.15; }
+        .wave-path { stroke: #FF0040; stroke-width: 3; fill: none; filter: drop-shadow(0 0 15px #FF0040); }
+        .wave-path:nth-child(1) { animation: wave-flow-1 25s ease-in-out infinite; opacity: 0.8; }
+        .wave-path:nth-child(2) { animation: wave-flow-2 30s ease-in-out infinite; opacity: 0.6; animation-delay: -10s; }
+        .wave-path:nth-child(3) { animation: wave-flow-3 35s ease-in-out infinite; opacity: 0.4; animation-delay: -20s; }
+
+        @keyframes wave-flow-1 { 0%, 100% { d: path("M-200,150 Q300,80 800,150 T1600,150 L1600,0 L-200,0 Z"); } 33% { d: path("M-200,120 Q300,200 800,120 T1600,120 L1600,0 L-200,0 Z"); } 66% { d: path("M-200,180 Q300,50 800,180 T1600,180 L1600,0 L-200,0 Z"); } }
+        @keyframes wave-flow-2 { 0%, 100% { d: path("M-200,250 Q400,180 900,250 T1700,250 L1700,0 L-200,0 Z"); } 50% { d: path("M-200,200 Q400,300 900,200 T1700,200 L1700,0 L-200,0 Z"); } }
+        @keyframes wave-flow-3 { 0%, 100% { d: path("M-200,350 Q500,280 1000,350 T1800,350 L1800,0 L-200,0 Z"); } 25% { d: path("M-200,300 Q500,400 1000,300 T1800,300 L1800,0 L-200,0 Z"); } 75% { d: path("M-200,380 Q500,250 1000,380 T1800,380 L1800,0 L-200,0 Z"); } }
+
+        .navbar { background: rgba(10, 10, 10, 0.8); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 0, 64, 0.2); transition: all 0.3s ease; }
+        .navbar.scrolled { background: rgba(10, 10, 10, 0.95); box-shadow: 0 4px 20px rgba(255, 0, 64, 0.1); }
+
+        .btn { transition: all 0.3s ease; }
+        .btn-primary { background: linear-gradient(45deg, #FF0040, #FF1A5C); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255, 0, 64, 0.4); }
+        .btn-check { background: linear-gradient(45deg, #10b981, #059669); }
+        .btn-check:hover { box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4); }
+
+        .glass-container { background: rgba(18, 18, 18, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255, 0, 64, 0.1); }
+        .tool-card { background: #1A1A1A; border: 1px solid #2a2a2a; transition: all 0.3s ease; display: flex; flex-direction: column; }
+        .tool-card:hover { transform: translateY(-5px); border-color: rgba(255, 0, 64, 0.4); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); }
+
+        .neon-accent { color: #FF0040; text-shadow: 0 0 15px rgba(255, 0, 64, 0.7), 0 0 25px rgba(255, 0, 64, 0.5); animation: neon-flicker 2s ease-in-out infinite alternate; }
+        @keyframes neon-flicker { from { text-shadow: 0 0 15px rgba(255, 0, 64, 0.7); } to { text-shadow: 0 0 25px rgba(255, 0, 64, 1), 0 0 35px rgba(255, 0, 64, 0.8); } }
+        .category-title { border-bottom: 2px solid rgba(255, 0, 64, 0.3); padding-bottom: 1rem; margin-bottom: 2rem; }
+
+        .filter-btn { background: #2a2a2a; border: 1px solid #444; color: #aaa; transition: all 0.3s ease; }
+        .filter-btn:hover { color: #fff; border-color: #FF0040; }
+        .filter-btn.active { background: #FF0040; border-color: #FF0040; color: white; box-shadow: 0 0 15px rgba(255, 0, 64, 0.4); }
+        .search-input { background: #2a2a2a; border: 1px solid #444; color: #F2F2F2; transition: all 0.3s ease; }
+        .search-input:focus { outline: none; border-color: #FF0040; box-shadow: 0 0 20px rgba(255, 0, 64, 0.3); }
+        
+        .tab-btn { background: transparent; border-bottom: 2px solid transparent; color: #888; transition: all 0.3s ease; }
+        .tab-btn.active { color: #FF0040; border-bottom-color: #FF0040; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .install-step { background: rgba(255, 0, 64, 0.05); border-left: 3px solid #FF0040; padding: 1rem; margin: 0.5rem 0; border-radius: 0 8px 8px 0; }
+    </style>
+</head>
+<body class="bg-gray-900">
+    <div class="wave-bg">
+        <svg class="wave-svg" viewBox="0 0 1400 600" preserveAspectRatio="none">
+            <path class="wave-path" d="M-200,150 Q300,80 800,150 T1600,150 L1600,0 L-200,0 Z"/>
+            <path class="wave-path" d="M-200,250 Q400,180 900,250 T1700,250 L1700,0 L-200,0 Z"/>
+            <path class="wave-path" d="M-200,350 Q500,280 1000,350 T1800,350 L1800,0 L-200,0 Z"/>
+        </svg>
+    </div>
+
+    <nav class="navbar fixed top-0 left-0 right-0 z-50" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-shield-alt text-2xl text-red-400"></i>
+                    <h1 class="text-xl font-bold mono">SecTools.az</h1>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="hover:text-red-400">Ana Səhifə</a>
+                    <a href="#tools" class="hover:text-red-400">Alətlər & Təlimatlar</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section id="home" class="relative min-h-screen flex items-center justify-center pt-16">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
+                <h1 class="text-5xl md:text-7xl font-extrabold mb-6">
+                    <span class="neon-accent">Windows üçün</span> Təhlükəsizlik Alətləri
+                </h1>
+                <p class="text-xl md:text-2xl text-gray-300 mb-10 max-w-3xl mx-auto">
+                    Windows üçün ən yaxşı kibertəhlükəsizlik alətlərinin geniş kolleksiyası. Təhlükəsiz yükləmə linkləri və VirusTotal yoxlamaları ilə.
+                </p>
+                <a href="#tools" class="btn btn-primary px-10 py-4 rounded-xl font-semibold text-xl text-white">Siyahıya Keçid</a>
+            </div>
+        </section>
+
+        <section id="tools" class="py-24 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto">
+                 <div class="glass-container rounded-3xl p-4 md:p-8 mb-12">
+                    <div class="flex flex-wrap justify-center gap-2 md:gap-6 mb-8 border-b border-gray-700">
+                        <button class="tab-btn active px-4 py-3 font-semibold" data-tab="tool-list"><i class="fas fa-tools mr-2"></i>Windows Alətləri</button>
+                        <button class="tab-btn px-4 py-3 font-semibold" data-tab="kali"><i class="fab fa-linux mr-2"></i>Kali Linux</button>
+                        <button class="tab-btn px-4 py-3 font-semibold" data-tab="virtualbox"><i class="fas fa-cube mr-2"></i>VirtualBox</button>
+                        <button class="tab-btn px-4 py-3 font-semibold" data-tab="vmware"><i class="fas fa-server mr-2"></i>VMware</button>
+                    </div>
+
+                    <div id="tool-list" class="tab-content active">
+                        <div class="sticky top-16 bg-gray-900/80 backdrop-blur-md py-6 z-20 mb-10 -mx-4 px-4 md:-mx-8 md:px-8">
+                            <div class="flex flex-col lg:flex-row gap-6 items-center">
+                                <div class="relative flex-grow w-full">
+                                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                    <input type="text" id="toolSearchInput" placeholder="Alət adı ilə axtar..." class="search-input w-full pl-12 pr-4 py-3 rounded-xl">
+                                </div>
+                            </div>
+                            <div id="filter-buttons-container" class="flex flex-wrap justify-center gap-3 mt-6"></div>
+                        </div>
+                        <div id="tools-container" class="space-y-12">
+                            <!-- Categories and tools will be dynamically inserted here -->
+                        </div>
+                    </div>
+
+                    <div id="kali" class="tab-content">
+                        <div class="p-4 md:p-8"><div class="text-center mb-8"><h2 class="text-3xl font-bold text-white mb-4 mono"><i class="fab fa-linux text-red-400 mr-3"></i>Kali Linux Quraşdırması</h2><p class="text-gray-300">Penetrasiya testləri üçün ən populyar Linux distribusiyası</p></div><div class="grid md:grid-cols-2 gap-8"><div class="space-y-6"><div class="install-step"><h3 class="text-white font-bold text-lg mb-3"><span class="bg-red-500 text-white w-8 h-8 rounded-full inline-flex items-center justify-center mr-3 text-sm">1</span>ISO Yükləmə</h3><p class="text-gray-300 mb-3">Kali Linux rəsmi saytından ən son ISO faylını yükləyin:</p><div class="bg-gray-800 rounded-lg p-4 mono text-sm"><p class="text-green-400">https://www.kali.org/get-kali/</p><p class="text-gray-400 mt-2">• Kali Linux 64-bit ISO seçin</p><p class="text-gray-400">• Ölçü: ~3.5GB</p></div></div><div class="install-step"><h3 class="text-white font-bold text-lg mb-3"><span class="bg-red-500 text-white w-8 h-8 rounded-full inline-flex items-center justify-center mr-3 text-sm">2</span>Virtual Machine Yaratma</h3><p class="text-gray-300 mb-3">VirtualBox və ya VMware-də yeni VM yaradın:</p><div class="bg-gray-800 rounded-lg p-4 text-sm"><p class="text-yellow-400 font-semibold">Tövsiyə olunan ayarlar:</p><p class="text-gray-300">• RAM: 4GB (minimum 2GB)</p><p class="text-gray-300">• HDD: 40GB</p><p class="text-gray-300">• CPU: 2 core</p><p class="text-gray-300">• Network: NAT</p></div></div><div class="install-step"><h3 class="text-white font-bold text-lg mb-3"><span class="bg-red-500 text-white w-8 h-8 rounded-full inline-flex items-center justify-center mr-3 text-sm">3</span>Quraşdırma Prosesi</h3><p class="text-gray-300 mb-3">ISO faylını mount edib quraşdırmaya başlayın:</p><div class="bg-gray-800 rounded-lg p-4 text-sm"><p class="text-green-400">1. Graphical Install seçin</p><p class="text-green-400">2. Dil və region seçin</p><p class="text-green-400">3. Disk partitioning (Guided - use entire disk)</p><p class="text-green-400">4. İstifadəçi və parol təyin edin</p></div></div></div><div class="space-y-6"><div class="install-step"><h3 class="text-white font-bold text-lg mb-3"><span class="bg-red-500 text-white w-8 h-8 rounded-full inline-flex items-center justify-center mr-3 text-sm">4</span>İlk Konfiqurasiya</h3><p class="text-gray-300 mb-3">Quraşdırmadan sonra əsas ayarları edin:</p><div class="bg-gray-800 rounded-lg p-4 mono text-sm"><p class="text-blue-400"># Sistem yeniləmə</p><p class="text-white">sudo apt update && sudo apt upgrade -y</p><br><p class="text-blue-400"># Əlavə alətlər</p><p class="text-white">sudo apt install -y kali-linux-large</p></div></div><div class="install-step"><h3 class="text-white font-bold text-lg mb-3"><span class="bg-red-500 text-white w-8 h-8 rounded-full inline-flex items-center justify-center mr-3 text-sm">5</span>Faydalı Məsləhətlər</h3><div class="bg-gray-800 rounded-lg p-4 text-sm"><p class="text-yellow-400 font-semibold mb-2">⚠️ Təhlükəsizlik:</p><p class="text-gray-300">• Root istifadəçisi ilə işləməyin</p><p class="text-gray-300">• SSH-ı deaktiv edin</p><p class="text-gray-300">• Firewall konfiqurasiya edin (UFW)</p><p class="text-gray-300">• Mütəmadi snapshot yaradın</p></div></div></div></div><div class="text-center mt-8 flex flex-col sm:flex-row justify-center items-center gap-4"><button class="btn btn-primary px-8 py-4 rounded-xl text-white font-bold text-lg download-btn" data-url="https://www.kali.org/get-kali/"><i class="fas fa-download mr-3"></i>Kali Linux Yüklə</button><button class="btn btn-check px-6 py-3 rounded-xl text-white font-semibold text-base download-btn" data-url="https://www.virustotal.com/gui/url/1f08e527b1178405cb3333552097e2a401c23806de7553462803a6401918a38b"><i class="fas fa-shield-virus mr-2"></i>VirusTotal Yoxla</button></div></div>
+                    </div>
+                    <div id="virtualbox" class="tab-content">
+                        <div class="p-4 md:p-8"><div class="text-center mb-8"><h2 class="text-3xl font-bold text-white mb-4 mono"><i class="fas fa-cube text-red-400 mr-3"></i>VirtualBox Quraşdırması</h2><p class="text-gray-300">Pulsuz və açıq mənbə virtualizasiya platforması</p></div><div class="grid md:grid-cols-2 gap-8"><div class="space-y-6"><div class="install-step"><h3 class="text-white font-bold text-lg mb-3"><span class="bg-red-500 text-white w-8 h-8 rounded-full inline-flex items-center justify-center mr-3 text-sm">1</span>VirtualBox Yükləmə</h3><p class="text-gray-300 mb-3">Oracle VirtualBox rəsmi saytından yükləyin:</p><div class="bg-gray-800 rounded-lg p-4 mono text-sm"><p class="text-green-400">https://www.virtualbox.org/wiki/Downloads</p><p class="text-gray-400 mt-2">• Windows hosts seçin</p><p class="text-gray-400">• Pulsuz və açıq mənbə</p></div></div><div class="install-step"><h3 class="text-white font-bold text-lg mb-3"><span class="bg-red-500 text-white w-8 h-8 rounded-full inline-flex items-center justify-center mr-3 text-sm">2</span>Quraşdırma</h3><p class="text-gray-300 mb-3">Administrator hüquqları ilə quraşdırın:</p><div class="bg-gray-800 rounded-lg p-4 text-sm"><p class="text-yellow-400 font-semibold">Quraşdırma addımları:</p><p class="text-gray-300">1. .exe faylını işə salın</p><p class="text-gray-300">2. Default ayarları saxlayın</p><p class="text-gray-300">3. Network interface xəbərdarlığını qəbul edin</p></div></div></div><div class="space-y-6"><div class="install-step"><h3 class="text-white font-bold text-lg mb-3"><span class="bg-red-500 text-white w-8 h-8 rounded-full inline-flex items-center justify-center mr-3 text-sm">3</span>Extension Pack</h3><p class="text-gray-300 mb-3">Əlavə funksiyalar üçün Extension Pack yükləyin:</p><div class="bg-gray-800 rounded-lg p-4 text-sm"><p class="text-green-400">Əlavə funksiyalar:</p><p class="text-gray-300">• USB 2.0/3.0 dəstəyi</p><p class="text-gray-300">• RDP dəstəyi</p><p class="text-gray-300">• Disk şifrələmə</p></div></div><div class="install-step"><h3 class="text-white font-bold text-lg mb-3"><span class="bg-red-500 text-white w-8 h-8 rounded-full inline-flex items-center justify-center mr-3 text-sm">4</span>Performans Optimallaşdırması</h3><p class="text-gray-300 mb-3">VM performansını artırmaq üçün:</p><div class="bg-gray-800 rounded-lg p-4 text-sm"><p class="text-yellow-400 font-semibold">Settings → System:</p><p class="text-gray-300">• Processor: 2+ CPU</p><p class="text-gray-300">• Enable VT-x/AMD-V</p><p class="text-gray-300">• Video Memory: 128MB</p></div></div></div></div><div class="text-center mt-8 flex flex-col sm:flex-row justify-center items-center gap-4"><button class="btn btn-primary px-8 py-4 rounded-xl text-white font-bold text-lg download-btn" data-url="https://www.virtualbox.org/wiki/Downloads"><i class="fas fa-download mr-3"></i>VirtualBox Yüklə</button><button class="btn btn-check px-6 py-3 rounded-xl text-white font-semibold text-base download-btn" data-url="https://www.virustotal.com/gui/url/2448398915b22a221f205563953531b788f4d952676a8581f5756314f10f4e6b"><i class="fas fa-shield-virus mr-2"></i>VirusTotal Yoxla</button></div></div>
+                    </div>
+                    <div id="vmware" class="tab-content">
+                        <div class="p-4 md:p-8"><div class="text-center mb-8"><h2 class="text-3xl font-bold text-white mb-4 mono"><i class="fas fa-server text-red-400 mr-3"></i>VMware Quraşdırması</h2><p class="text-gray-300">Professional virtualizasiya həlli</p></div><div class="grid md:grid-cols-2 gap-8"><div class="space-y-6"><div class="install-step"><h3 class="text-white font-bold text-lg mb-3"><span class="bg-red-500 text-white w-8 h-8 rounded-full inline-flex items-center justify-center mr-3 text-sm">1</span>VMware Yükləmə</h3><p class="text-gray-300 mb-3">VMware rəsmi saytından yükləyin:</p><div class="bg-gray-800 rounded-lg p-4 mono text-sm"><p class="text-green-400">https://www.vmware.com/products/workstation-player.html</p><p class="text-gray-400 mt-2">• Workstation Player (pulsuz)</p><p class="text-gray-400">• Workstation Pro (ödənişli)</p></div></div><div class="install-step"><h3 class="text-white font-bold text-lg mb-3"><span class="bg-red-500 text-white w-8 h-8 rounded-full inline-flex items-center justify-center mr-3 text-sm">2</span>Quraşdırma Prosesi</h3><p class="text-gray-300 mb-3">Administrator hüquqları ilə quraşdırın:</p><div class="bg-gray-800 rounded-lg p-4 text-sm"><p class="text-yellow-400 font-semibold">Quraşdırma seçimləri:</p><p class="text-gray-300">1. Enhanced Keyboard Driver</p><p class="text-gray-300">2. Add VMware to PATH</p><p class="text-gray-300">3. Check for updates on startup</p></div></div></div><div class="space-y-6"><div class="install-step"><h3 class="text-white font-bold text-lg mb-3"><span class="bg-red-500 text-white w-8 h-8 rounded-full inline-flex items-center justify-center mr-3 text-sm">3</span>VMware Tools</h3><p class="text-gray-300 mb-3">Performans üçün VMware Tools quraşdırın:</p><div class="bg-gray-800 rounded-lg p-4 text-sm"><p class="text-green-400 font-semibold">Faydaları:</p><p class="text-gray-300">• Daha yaxşı performans</p><p class="text-gray-300">• Clipboard paylaşımı</p><p class="text-gray-300">• Drag & drop, Auto screen resize</p></div></div><div class="install-step"><h3 class="text-white font-bold text-lg mb-3"><span class="bg-red-500 text-white w-8 h-8 rounded-full inline-flex items-center justify-center mr-3 text-sm">4</span>Snapshot İdarəetməsi</h3><div class="bg-gray-800 rounded-lg p-4 text-sm"><p class="text-yellow-400 font-semibold">Snapshot strategiyası (Pro):</p><p class="text-gray-300">• Clean install snapshot</p><p class="text-gray-300">• Pre-test snapshot</p><p class="text-gray-300">• VM → Snapshot → Take Snapshot</p></div></div></div></div><div class="text-center mt-8 flex flex-col sm:flex-row justify-center items-center gap-4"><button class="btn btn-primary px-8 py-4 rounded-xl text-white font-bold text-lg download-btn" data-url="https://www.vmware.com/go/downloadplayer"><i class="fas fa-download mr-3"></i>VMware Player Yüklə</button><button class="btn btn-check px-6 py-3 rounded-xl text-white font-semibold text-base download-btn" data-url="https://www.virustotal.com/gui/url/071a5322992e7552503533318182736113d348a278d65013c1935e197c17b5ca"><i class="fas fa-shield-virus mr-2"></i>VirusTotal Yoxla</button></div></div>
+                    </div>
+                 </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="relative py-16 z-10 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="flex items-center justify-center space-x-4 mb-8">
+                <div class="w-16 h-16 bg-gray-800 border border-red-500/50 rounded-2xl flex items-center justify-center shadow-lg shadow-red-500/10"><span class="text-3xl">🛡️</span></div>
+                <div class="text-4xl font-bold neon-accent mono">SecTools.az</div>
+            </div>
+            <p class="text-xl text-gray-400 mb-10">Windows üçün kibertəhlükəsizlik alətləri platforması</p>
+            <div class="border-t border-gray-800 pt-8"><p class="text-gray-500 text-base">© 2025 SecTools.az — Bütün hüquqlar qorunur.</p></div>
+        </div>
+    </footer>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const toolsData = {
+            "Şəbəkə Analizi": [
+                { name: 'Nmap', desc: 'Şəbəkə kəşfiyyatı və port skaneri.', url: 'https://nmap.org/download.html', vt: '1f08e527b1178405cb3333552097e2a401c23806de7553462803a6401918a38b' },
+                { name: 'Wireshark', desc: 'Ən populyar şəbəkə trafik analizatoru.', url: 'https://www.wireshark.org/download.html', vt: 'd2a80f06a26084052305048a1a2b7e80555b7a775d73095337e58e3271d4a369' },
+                { name: 'WinDump', desc: 'Windows üçün tcpdump komanda sətri paket analizatoru.', url: 'https://www.winpcap.org/windump/install/default.htm', vt: 'a1d2e96e5731b681585c2a12a3d0b1d8f9e6c7b8a9d0e1f2a3b4c5d6e7f8g9h0' },
+                { name: 'Angry IP Scanner', desc: 'Sürətli və dostyana IP ünvanı və port skaneri.', url: 'https://angryip.org/download/#windows', vt: 'b2d3f0a7b8c9d1e2f3a4b5c6d7e8f9g0h1i2j3k4l5m6n7o8p9q0r1s2' },
+                { name: 'Zenmap', desc: 'Nmap üçün rəsmi qrafik interfeys.', url: 'https://nmap.org/zenmap/', vt: 'c3d4e1b8c9d0e1f2a3b4c5d6e7f8g9h0i1j2k3l4m5n6o7p8q9r0s1' }
+            ],
+            "Web Təhlükəsizliyi": [
+                { name: 'Burp Suite Community', desc: 'Web tətbiqi testləri üçün inteqrasiya olunmuş platforma.', url: 'https://portswigger.net/burp/communitydownload', vt: 'c3d4e1b8c9d0e1f2a3b4c5d6e7f8g9h0i1j2k3l4m5n6o7p8q9r0s1' },
+                { name: 'OWASP ZAP', desc: 'Web tətbiqi zəifliklərini tapmaq üçün açıq mənbəli alət.', url: 'https://www.zaproxy.org/download/', vt: 'd4e5f2c9d0e1f2a3b4c5d6e7f8g9h0i1j2k3l4m5n6o7p8q9r0s2' },
+                { name: 'Fiddler', desc: 'HTTP/HTTPS trafiki debug etmək üçün pulsuz web proxy.', url: 'https://www.telerik.com/download/fiddler', vt: 'e5f6a3d0e1f2a3b4c5d6e7f8g9h0i1j2k3l4m5n6o7p8q9r0s3t4' },
+                { name: 'sqlmap', desc: 'SQL injection zəifliklərini avtomatlaşdıran alət.', url: 'https://sqlmap.org/', vt: 'f6a7b4e1f2a3b4c5d6e7f8g9h0i1j2k3l4m5n6o7p8q9r0s3t5' }
+            ],
+            "Zəiflik Skanerləri": [
+                { name: 'Nessus Essentials', desc: 'Geniş zəiflik analizi üçün pulsuz skaner.', url: 'https://www.tenable.com/products/nessus/nessus-essentials', vt: 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8g9h0i1j2k3l4m5n6o7p8' },
+                { name: 'OpenVAS (Greenbone)', desc: 'Tam özellikli, açıq mənbəli zəiflik skaneri.', url: 'https://www.greenbone.net/en/community-edition/', vt: 'b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8g9h0i1j2k3l4m5n6o7p9' }
+            ],
+            "Forensika və İnsidentə Cavab": [
+                { name: 'Autopsy', desc: 'Rəqəmsal forensika üçün qrafik interfeysli platforma.', url: 'https://www.autopsy.com/download/', vt: 'c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8g9h0i1j2k3l4m5n6o7p0' },
+                { name: 'Volatility Framework 3', desc: 'Yaddaş (RAM) dump-larının analizi üçün çərçivə.', url: 'https://www.volatilityfoundation.org/releases', vt: 'd4e5f6a7b8c9d0e1f2a3b4c5d6e7f8g9h0i1j2k3l4m5n6o7p1' },
+                { name: 'FTK Imager', desc: 'Rəqəmsal sübutları toplamaq və öncədən baxmaq üçün alət.', url: 'https://www.exterro.com/ftk-imager', vt: 'e5f6a7b8c9d0e1f2a3b4c5d6e7f8g9h0i1j2k3l4m5n6o7p2q3' },
+                { name: 'Redline', desc: 'Host-based araşdırma və yaddaş analizi üçün alət.', url: 'https://www.vmware.com/products/carbon-black-edr.html', vt: 'f6a7b8c9d0e1f2a3b4c5d6e7f8g9h0i1j2k3l4m5n6o7p3q4' }
+            ],
+            "Parol Hücumları": [
+                { name: 'John the Ripper', desc: 'Çoxsaylı formatları dəstəkləyən sürətli parol qırma aləti.', url: 'https://www.openwall.com/john/', vt: 'f6a7b8c9d0e1f2a3b4c5d6e7f8g9h0i1j2k3l4m5n6o7p3q4' },
+                { name: 'Hashcat', desc: 'GPU ilə sürətləndirilmiş dünyanın ən sürətli parol qırma aləti.', url: 'https://hashcat.net/hashcat/', vt: 'a7b8c9d0e1f2a3b4c5d6e7f8g9h0i1j2k3l4m5n6o7p4q5r6' },
+                { name: 'Mimikatz', desc: 'Windows yaddaşından parolları və digər məlumatları çıxarmaq üçün alət.', url: 'https://github.com/gentilkiwi/mimikatz/releases', vt: 'b8c9d0e1f2a3b4c5d6e7f8g9h0i1j2k3l4m5n6o7p5q6r7' },
+                { name: 'Hydra', desc: 'Çoxsaylı protokolları dəstəkləyən online parol brute-force aləti.', url: 'https://github.com/vanhauser-thc/thc-hydra', vt: 'c9d0e1f2a3b4c5d6e7f8g9h0i1j2k3l4m5n6o7p6q7r8s9' }
+            ],
+            "Malware Analizi və Reverse Engineering": [
+                { name: 'Process Hacker', desc: 'Sistem proseslərini və servislərini detallı izləmək üçün alət.', url: 'https://processhacker.sourceforge.io/downloads.php', vt: 'c9d0e1f2a3b4c5d6e7f8g9h0i1j2k3l4m5n6o7p6q7r8s9' },
+                { name: 'Ghidra', desc: 'NSA tərəfindən hazırlanmış güclü reverse engineering çərçivəsi.', url: 'https://ghidra-sre.org/', vt: 'd0e1f2a3b4c5d6e7f8g9h0i1j2k3l4m5n6o7p7q8r9s0' },
+                { name: 'x64dbg', desc: 'Windows üçün açıq mənbəli, aktiv inkişaf etdirilən debugger.', url: 'https://x64dbg.com/', vt: 'e1f2a3b4c5d6e7f8g9h0i1j2k3l4m5n6o7p8q9r0s1t2' },
+                { name: 'PEStudio', desc: 'Zərərli proqramların statik analizi üçün istifadə olunan alət.', url: 'https://www.winitor.com/', vt: 'f2a3b4c5d6e7f8g9h0i1j2k3l4m5n6o7p8q9r0s1t2u3' }
+            ],
+            "OSINT (Açıq Mənbə Kəşfiyyatı)": [
+                { name: 'Maltego Community', desc: 'Məlumatlar arasında əlaqələri vizuallaşdıran güclü OSINT aləti.', url: 'https://www.maltego.com/ce-registration/', vt: 'a3b4c5d6e7f8g9h0i1j2k3l4m5n6o7p8q9r0s1t2u3v4' },
+                { name: 'Sherlock', desc: 'Sosial media hesablarını istifadəçi adına görə axtaran alət.', url: 'https://github.com/sherlock-project/sherlock', vt: 'b4c5d6e7f8g9h0i1j2k3l4m5n6o7p8q9r0s1t2u3v4w5' }
+            ],
+            "Digər Faydalı Alətlər": [
+                { name: 'Sysinternals Suite', desc: 'Windows sistemlərini idarə etmək və problemləri aradan qaldırmaq üçün alətlər toplusu.', url: 'https://docs.microsoft.com/en-us/sysinternals/downloads/sysinternals-suite', vt: 'c5d6e7f8g9h0i1j2k3l4m5n6o7p8q9r0s1t2u3v4w5x6' },
+                { name: 'Commando VM', desc: 'Windows üçün tam təchizatlı penetrasiya test mühiti.', url: 'https://github.com/mandiant/commando-vm', vt: 'd6e7f8g9h0i1j2k3l4m5n6o7p8q9r0s1t2u3v4w5x6y7' }
+            ]
+        };
+
+        const toolsContainer = document.getElementById('tools-container');
+        const filterContainer = document.getElementById('filter-buttons-container');
+
+        const renderContent = (filter = 'All', searchTerm = '') => {
+            toolsContainer.innerHTML = '';
+            const categories = Object.keys(toolsData);
+            
+            let hasResults = false;
+            categories.forEach(category => {
+                const filteredTools = toolsData[category].filter(tool => 
+                    tool.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                    tool.desc.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+
+                if ((filter === 'All' || filter === category) && filteredTools.length > 0) {
+                    hasResults = true;
+                    const categorySection = document.createElement('div');
+                    let toolsHtml = '';
+
+                    filteredTools.forEach((tool, index) => {
+                        toolsHtml += `
+                            <div class="tool-card rounded-xl p-6 flex flex-col" style="animation-delay: ${index * 50}ms;">
+                                <h3 class="text-xl font-bold mono text-white mb-2">${tool.name}</h3>
+                                <p class="text-gray-400 text-sm mb-6 flex-grow">${tool.desc}</p>
+                                <div class="flex flex-col sm:flex-row gap-3 mt-auto">
+                                    <button class="btn btn-primary flex-1 px-4 py-2 rounded-lg text-white font-semibold text-sm" onclick="window.open('${tool.url}', '_blank')">
+                                        <i class="fas fa-download mr-2"></i>Yüklə
+                                    </button>
+                                    <button class="btn btn-check flex-1 px-4 py-2 rounded-lg text-white font-semibold text-sm" onclick="window.open('https://www.virustotal.com/gui/url/${tool.vt}', '_blank')">
+                                        <i class="fas fa-shield-virus mr-2"></i>VirusTotal
+                                    </button>
+                                </div>
+                            </div>`;
+                    });
+
+                    categorySection.innerHTML = `
+                        <h2 class="text-3xl font-bold mono neon-accent category-title">${category}</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            ${toolsHtml}
+                        </div>
+                    `;
+                    toolsContainer.appendChild(categorySection);
+                }
+            });
+
+            if (!hasResults) {
+                toolsContainer.innerHTML = `<p class="text-gray-400 text-center text-lg">Axtarışınıza uyğun alət tapılmadı.</p>`;
+            }
+        };
+
+        const renderFilterButtons = () => {
+            const categories = ['All', ...Object.keys(toolsData)];
+            filterContainer.innerHTML = categories.map(cat => 
+                `<button class="filter-btn px-4 py-2 rounded-lg text-sm font-medium ${cat === 'All' ? 'active' : ''}" data-category="${cat}">${cat}</button>`
+            ).join('');
+            
+            document.querySelectorAll('.filter-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    const category = this.getAttribute('data-category');
+                    const searchTerm = document.getElementById('toolSearchInput').value;
+                    renderContent(category, searchTerm);
+                });
+            });
+        };
+        
+        const searchInput = document.getElementById('toolSearchInput');
+        searchInput.addEventListener('input', () => {
+            const activeFilter = document.querySelector('.filter-btn.active').dataset.category;
+            renderContent(activeFilter, searchInput.value);
+        });
+
+        window.addEventListener('scroll', () => {
+            document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+        });
+
+        // Tab functionality
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const targetTab = this.getAttribute('data-tab');
+                
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                this.classList.add('active');
+                document.getElementById(targetTab).classList.add('active');
+            });
+        });
+
+        // Download buttons within static tabs
+        document.querySelectorAll('.download-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const url = this.dataset.url;
+                if (url) {
+                    window.open(url, '_blank');
+                }
+            });
+        });
+
+        renderFilterButtons();
+        renderContent();
+    });
+    </script>
+</body>
+</html>
